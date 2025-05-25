@@ -19,6 +19,26 @@ pipeline {
             }
         }
 
+    
+    stage('Configure AWS Credentials') {
+    steps {
+        withCredentials([
+            string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
+            string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY')
+        ]) {
+            sh '''
+            mkdir -p ~/.aws
+            cat > ~/.aws/credentials <<EOF
+            [default]
+            aws_access_key_id = $AWS_ACCESS_KEY_ID
+            aws_secret_access_key = $AWS_SECRET_ACCESS_KEY
+            EOF
+            '''
+        }
+           }
+       }
+
+
         stage('Terraform Init & Apply') {
             steps {
                 dir(env.TF_DIR) {
@@ -31,6 +51,7 @@ pipeline {
         stage('Apply Kubernetes Manifests') {
             steps {
                 dir(env.KUBE_DIR) {
+                    sh 'aws eks update-kubeconfig --name my-sign-recognition-cluster --region us-east-1'
                     sh 'kubectl apply -f .'
                 }
             }
