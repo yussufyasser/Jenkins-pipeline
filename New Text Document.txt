@@ -7,3 +7,10 @@ aws eks update-kubeconfig --name my-sign-recognition-cluster --region us-east-1
 cd ../Kubernetes
 kubectl apply -f .
 
+
+>>>>>>>>
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+kubectl get secret argocd-initial-admin-secret -n argocd \
+  -o jsonpath="{.data.password}" | base64 --decode
