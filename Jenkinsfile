@@ -98,9 +98,9 @@ EOF
 
                     if [ -z "$ARGOCD_SERVER" ]; then
                       echo "No LoadBalancer found, using port-forward on localhost..."
-                      kubectl port-forward svc/argocd-server -n $ARGO_NAMESPACE 8080:443 &
+                      kubectl port-forward svc/argocd-server -n $ARGO_NAMESPACE 8090:443 &
                       sleep 5
-                      ARGOCD_SERVER="localhost:8080"
+                      ARGOCD_SERVER="localhost:8090"
                     fi
 
                     echo "Logging into Argo CD server $ARGOCD_SERVER ..."
