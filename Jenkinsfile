@@ -42,6 +42,8 @@ pipeline {
         stage('Terraform Init & Apply') {
             steps {
                 dir(env.TF_DIR) {
+                    sh 'aws sts get-caller-identity'
+
                     sh 'terraform init'
                     sh 'terraform apply -auto-approve'
                 }
