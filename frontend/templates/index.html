@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Language Detection</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>Sign Language Detector</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+      <input type="file" name="image" id="imageInput" accept="image/*" required>
+      <img id="preview" src="#" alt="Image Preview">
+      <select name="language" id="language">
+        <option value="arabic">Arabic</option>
+        <option value="english">English</option>
+      </select>
+      <button type="submit">Detect</button>
+      <div id="loader">⏳ Detecting...</div>
+      <div id="result">Prediction: <span id="output">None</span></div>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById("uploadForm");
+    const preview = document.getElementById("preview");
+    const loader = document.getElementById("loader");
+    const output = document.getElementById("output");
+
+    document.getElementById("imageInput").addEventListener("change", function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.style.display = "none";
+      }
+    });
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      loader.style.display = "block";
+      output.innerText = "None";
+
+      const formData = new FormData(form);
+      const res = await fetch("/detect", { method: "POST", body: formData });
+
+      loader.style.display = "none";
+
+      const data = await res.json();
+      output.innerText = data.message || data.error || "No result";
+    };
+  </script>
+</body>
+</html>

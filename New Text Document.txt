@@ -14,3 +14,6 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 
 kubectl get secret argocd-initial-admin-secret -n argocd \
   -o jsonpath="{.data.password}" | base64 --decode
+
+aws dynamodb delete-item   --table-name terraform-locks-sign-recognition   --key '{"LockID": {"S": "sign-recognition-app-state/eks/te
+rraform.tfstate"}}'
