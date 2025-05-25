@@ -56,6 +56,8 @@ EOF
                 dir(env.KUBE_DIR) {
                     sh 'aws eks update-kubeconfig --name my-sign-recognition-cluster --region us-east-1'
                     sh 'kubectl apply -f .'
+                    sh 'kubectl create namespace argocd || true'
+                    sh 'kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml'
                 }
             }
         }
