@@ -8,4 +8,3 @@ terraform {
   }
 }
 
-#aws eks update-kubeconfig --name my-sign-recognition-cluster --region us-east-1

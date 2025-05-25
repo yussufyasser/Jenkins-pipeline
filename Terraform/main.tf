@@ -45,7 +45,7 @@ module "eks" {
   eks_managed_node_groups = {
     public = {
       desired_capacity = 2
-      instance_types   = ["t3.large"]
+      instance_types   = ["c5.large"]
       disk_size        = 30
       subnet_ids       = module.vpc.public_subnets
     }

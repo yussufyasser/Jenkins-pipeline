@@ -1,0 +1,9 @@
+cd Terraform
+terraform init
+terraform apply -auto-approve
+
+
+aws eks update-kubeconfig --name my-sign-recognition-cluster --region us-east-1
+cd ../Kubernetes
+kubectl apply -f .
+
