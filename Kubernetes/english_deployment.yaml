@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: english-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: english
+  template:
+    metadata:
+      labels:
+        app: english
+    spec:
+      containers:
+        - name: english-container
+          image: yussufzoulfakar/english:1.0
+          ports:
+            - containerPort: 5052

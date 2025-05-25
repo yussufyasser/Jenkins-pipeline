@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arabic-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arabic
+  template:
+    metadata:
+      labels:
+        app: arabic
+    spec:
+      containers:
+        - name: arabic-container
+          image: yussufzoulfakar/arabic:1.0
+          ports:
+            - containerPort: 5051
