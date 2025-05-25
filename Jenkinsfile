@@ -62,14 +62,35 @@ EOF
             }
         }
 
+        stage('Wait for Argo CD Pods') {
+            steps {
+                sh '''
+                echo "Waiting for Argo CD to be ready..."
+
+                # Wait up to 6 minutes total, checking every 30 seconds
+                for i in {1..12}; do
+                    NOT_READY=$(kubectl get pods -n argocd --field-selector=status.phase!=Running -o name)
+                    if [ -z "$NOT_READY" ]; then
+                        echo "All Argo CD pods are running!"
+                        exit 0
+                    fi
+                    echo "Still waiting for Argo CD pods to be ready..."
+                    sleep 30
+                done
+
+                echo "Timeout waiting for Argo CD pods."
+                kubectl get pods -n argocd
+                exit 1
+                '''
+            }
+        }
+
+
         stage('ArgoCD App Deployment') {
             steps {
                 script {
                     sh '''
                     set -e
-
-                    echo "Waiting for Argo CD pods to be ready..."
-                    kubectl wait --for=condition=Ready pods --all -n $ARGO_NAMESPACE --timeout=300s
 
                     echo "Fetching Argo CD initial admin password..."
                     ARGOCD_PASSWORD=$(kubectl -n $ARGO_NAMESPACE get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
