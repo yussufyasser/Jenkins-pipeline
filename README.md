@@ -143,16 +143,3 @@ These default to K8s service names or Docker links.
 | YOLOv8      | via `ultralytics` |
 
 ---
-
-## 👨‍💻 Maintainer
-
-[Yussuf Yasser](https://github.com/yussufyasser)
-
----
-
-## 🧪 Future Improvements
-
-- [ ] Add HTTPS with NGINX ingress
-- [ ] Use S3 for model storage
-- [ ] Add Prometheus/Grafana monitoring
-- [ ] GitHub Actions mirror for CI
