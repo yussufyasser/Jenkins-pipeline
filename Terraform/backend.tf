@@ -1,4 +1,4 @@
-terraform {
+ terraform {
   backend "s3" {
     bucket         = "sign-recognition-app-state"
     key            = "eks/terraform.tfstate"
