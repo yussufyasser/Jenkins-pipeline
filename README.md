@@ -1,5 +1,7 @@
 # ✋ Bilingual Sign Language Recognition System (Arabic & English)
 
+![App](result.png)
+
 A full-stack, production-grade sign language recognition system using real-time webcam input, YOLOv8 deep learning models, and an automated CI/CD pipeline powered by Jenkins, Docker, Kubernetes, ArgoCD, and Terraform.
 
 ---
