@@ -71,36 +71,14 @@ Each component of the system is containerized using Docker:
 - **English Backend** (`english/`): YOLOv8 Flask API in Docker
 - **Frontend** (`frontend/`): Flask + HTML UI in Docker
 
-Build locally:
 
-```bash
-docker build -t arabic-sign-api ./arabic
-docker build -t english-sign-api ./english
-docker build -t sign-frontend ./frontend
-```
-
----
-
-## ☸️ Kubernetes Deployment
-
-K8s manifests include Deployments and Services for:
-
-- `arabic-service`
-- `english-service`
-- `frontend-service`
-
-Deploy manually (optional):
-
-```bash
-kubectl apply -f Kubernetes/
-```
 
 Access via LoadBalancer:
 
 ```bash
 kubectl get svc frontend-service
 ```
-Note: Ensure your cluster supports LoadBalancer services (e.g., AWS EKS).
+
 
 ---
 
@@ -110,36 +88,4 @@ Terraform automates cloud provisioning:
 
 - EKS cluster for Kubernetes workloads
 - VPC, security groups, subnets
-- EKS-compatible config (if needed)
 
-```bash
-cd Terraform/
-terraform init
-terraform apply
-```
-
----
-
-## 🔧 Configuration & Environment
-
-- Backend Flask APIs respect env variables:
-  - `ARABIC_SERVICE_HOST`
-  - `ENGLISH_SERVICE_HOST`
-
-These default to K8s service names or Docker links.
-
----
-
-## 📋 Requirements
-
-| Tool        | Version |
-|-------------|---------|
-| Python      | ≥ 3.8   |
-| Docker      | Latest  |
-| Terraform   | ≥ 1.0   |
-| Jenkins     | LTS     |
-| ArgoCD CLI  | Latest  |
-| Kubernetes  | Any     |
-| YOLOv8      | via `ultralytics` |
-
----
