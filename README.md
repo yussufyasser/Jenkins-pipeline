@@ -95,11 +95,12 @@ Deploy manually (optional):
 kubectl apply -f Kubernetes/
 ```
 
-Access via:
+Access via LoadBalancer:
 
 ```bash
-minikube service frontend-service
+kubectl get svc frontend-service
 ```
+Note: Ensure your cluster supports LoadBalancer services (e.g., AWS EKS).
 
 ---
 
@@ -107,7 +108,7 @@ minikube service frontend-service
 
 Terraform automates cloud provisioning:
 
-- EC2 instance (for Jenkins or Docker host)
+- EKS cluster for Kubernetes workloads
 - VPC, security groups, subnets
 - EKS-compatible config (if needed)
 
