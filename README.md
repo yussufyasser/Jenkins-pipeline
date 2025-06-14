@@ -72,6 +72,13 @@ Each component of the system is containerized using Docker:
 - **Frontend** (`frontend/`): Flask + HTML UI in Docker
 
 
+## ☁️ Infrastructure with Terraform
+
+Terraform automates cloud provisioning:
+
+- EKS cluster for Kubernetes workloads
+- VPC, security groups, subnets
+
 
 Access via LoadBalancer:
 
@@ -79,13 +86,4 @@ Access via LoadBalancer:
 kubectl get svc frontend-service
 ```
 
-
----
-
-## ☁️ Infrastructure with Terraform
-
-Terraform automates cloud provisioning:
-
-- EKS cluster for Kubernetes workloads
-- VPC, security groups, subnets
 
