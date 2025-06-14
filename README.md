@@ -1,6 +1,6 @@
 # ✋ Bilingual Sign Language Recognition System (Arabic & English)
 
-A full-stack, production-grade sign language recognition system using real-time image input, YOLOv8 deep learning models, and a robust CI/CD & deployment pipeline powered by Jenkins, Docker, Kubernetes, and Terraform.
+A full-stack, production-grade sign language recognition system using real-time webcam input, YOLOv8 deep learning models, and an automated CI/CD pipeline powered by Jenkins, Docker, Kubernetes, and Terraform.
 
 ---
 
@@ -10,104 +10,133 @@ A full-stack, production-grade sign language recognition system using real-time 
 
 ---
 
-
 ## 📁 Project Structure
 
 ```
 Jenkins-pipeline/
-├── arabic/                 # Arabic model service (Flask + YOLO)
-├── english/                # English model service (Flask + YOLO)
-├── frontend/               # Web UI + gateway Flask app
-├── Jenkinsfile             # CI/CD pipeline definition
-├── Kubernetes/             # Kubernetes manifests for all services
-└── Terraform/              # Terraform infra provisioning scripts
+├── arabic/                 # Arabic model service (Flask + YOLOv8)
+├── english/                # English model service (Flask + YOLOv8)
+├── frontend/               # Flask gateway + HTML UI
+├── Jenkinsfile             # Jenkins pipeline stages
+├── Kubernetes/             # YAML manifests for services and deployments
+└── Terraform/              # IaC scripts for AWS infrastructure
 ```
 
 ---
 
-## 🚀 How to Run via Jenkins CI/CD
+## 🧠 Technical Overview
+
+### 🔤 Dual YOLOv8 Inference Services
+- Both `arabic/` and `english/` services load pre-trained `.pt` models using `ultralytics.YOLO`.
+- Each model detects one sign per image with highest confidence.
+- Outputs are returned via Flask APIs in real-time.
+
+### 🌍 Frontend Service
+- Flask app with `index.html` and JS-based webcam interface.
+- Accepts captured image, converts to base64, and sends to the selected backend (Arabic or English).
+- Receives prediction and displays it dynamically.
+
+### 🔁 Communication Flow
+- Services communicate via internal DNS in Kubernetes (`arabic-service`, `english-service`).
+- Frontend uses `requests.post()` to call backend APIs with image data.
+
+---
+
+## 🚀 Jenkins CI/CD Pipeline
 
 ### Jenkins Setup
+1. Deploy Jenkins using EC2 (manual or via Terraform).
+2. Install required plugins:
+   - Docker, Git, Pipeline, Kubernetes CLI
+3. Add Jenkins credentials:
+   - DockerHub login
+   - AWS access key for Terraform
 
-1. **Install Jenkins** (or launch via Terraform on EC2).
-2. **Install Plugins**:
-   - Docker
-   - Pipeline
-   - Kubernetes CLI
-   - Git
-3. **Configure Credentials**:
-   - DockerHub username/password
-   - AWS CLI for `terraform apply`
-
-### Pipeline Flow (from Jenkinsfile)
-
-1. **SCM Checkout** – Pulls this repo.
-2. **Testing** – Runs unit tests for Arabic and English model services.
-3. **Docker Build** – Builds Docker images for all services.
-4. **Push Images** – Pushes to DockerHub using your credentials.
-5. **Deploy to Kubernetes** – Uses `kubectl apply` to deploy the system.
-6. **Post-build info** – Shows deployment logs or URLs.
+### Pipeline Stages (Defined in `Jenkinsfile`)
+1. **Checkout**: Clones repo from GitHub.
+2. **Unit Testing**: Runs model service tests (Flask endpoints).
+3. **Docker Build**: Builds 3 images (Arabic, English, Frontend).
+4. **Docker Push**: Pushes to DockerHub using Jenkins secrets.
+5. **Kubernetes Deployment**: Applies K8s YAMLs to cluster.
+6. **Notifications**: Logs output, optionally send Slack or email.
 
 ### Triggering the Pipeline
-
-- Manual: Run pipeline from Jenkins UI
-- Auto: Set GitHub webhook on push to `main`/`master`
-
----
-
-## 📦 Backend Services
-
-**Arabic**
-- Endpoint: `/arabic_sign` (port 5051)
-
-**English**
-- Endpoint: `/english_sign` (port 5052)
-
-Both return predicted characters based on YOLOv8 detection.
+- Manual: Click "Build Now" in Jenkins UI.
+- Automatic: GitHub webhook triggers on push.
 
 ---
 
-## 🌐 Frontend UI
+## 🐳 Docker Services
 
-- Flask app with HTML interface (`index.html`)
-- Communicates with Arabic or English service based on dropdown selection
-- Displays prediction output directly to the user
+Each microservice has its own `Dockerfile`.
+
+### Example (Arabic):
+```bash
+docker build -t arabic-sign-api ./arabic
+docker run -p 5051:5051 arabic-sign-api
+```
 
 ---
 
 ## ☸️ Kubernetes Deployment
 
-All services are deployed to Kubernetes via:
+Manifests included for:
+- `arabic-service` and `english-service`: Expose model APIs
+- `frontend-service`: Serves UI
+- Each has its own Deployment and ClusterIP Service
 
 ```bash
 kubectl apply -f Kubernetes/
 ```
 
----
-
-## ☁️ Terraform Infrastructure
-
-Run in `Terraform/`:
+Access via:
 
 ```bash
+minikube service frontend-service
+# OR
+kubectl get svc frontend-service
+```
+
+---
+
+## ☁️ Infrastructure with Terraform
+
+Terraform files provision:
+
+- Jenkins EC2 instance
+- Security groups, key pairs, subnets
+- Optional EKS cluster (Kubernetes)
+
+### To Deploy:
+```bash
+cd Terraform/
 terraform init
 terraform apply
 ```
 
-This can provision:
-- Jenkins EC2
-- Kubernetes cluster (EKS-ready)
-- Security groups, key pairs, networking
+Backend state can be stored in S3 (configured in `backend.tf`).
 
 ---
 
-## 🛠️ Requirements
+## 🔧 Config & Environment
 
-- Python ≥ 3.8
-- Docker & DockerHub
-- Kubernetes cluster or Minikube
-- Terraform CLI
-- Jenkins server
+- Flask backend services support env overrides:
+  - `ARABIC_SERVICE_HOST`
+  - `ENGLISH_SERVICE_HOST`
+- These map to Kubernetes internal service names.
+
+---
+
+## 📋 Requirements
+
+| Tool        | Version |
+|-------------|---------|
+| Python      | ≥ 3.8   |
+| Docker      | Latest  |
+| Terraform   | ≥ 1.0   |
+| Jenkins     | LTS     |
+| Kubernetes  | Any     |
+| Ultralytics | YOLOv8  |
 
 ---
 
@@ -117,9 +146,9 @@ This can provision:
 
 ---
 
-## 🧪 TODO
+## 🧪 Future Improvements
 
-- [ ] Add NGINX ingress controller
-- [ ] Add S3 model hosting & pull
-- [ ] Add metrics & alerts (Prometheus/Grafana)
-
+- [ ] Ingress with NGINX and TLS
+- [ ] Model versioning via S3
+- [ ] Monitoring: Prometheus + Grafana
+- [ ] Centralized logging (e.g., ELK stack)
