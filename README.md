@@ -151,16 +151,3 @@ Backend state can be stored in S3 (configured in `backend.tf`).
 | Ultralytics | YOLOv8  |
 
 ---
-
-## 👨‍💻 Maintainer
-
-[Yussuf Yasser](https://github.com/yussufyasser)
-
----
-
-## 🧪 Future Improvements
-
-- [ ] Ingress with NGINX and TLS
-- [ ] Model versioning via S3
-- [ ] Monitoring: Prometheus + Grafana
-- [ ] Centralized logging (e.g., ELK stack)
