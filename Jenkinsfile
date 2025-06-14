@@ -1,6 +1,7 @@
 pipeline {
     agent any
 
+    
     environment {
         TF_DIR = "${WORKSPACE}/Terraform"
         KUBE_DIR = "${WORKSPACE}/Kubernetes"
