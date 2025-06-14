@@ -20,7 +20,6 @@ RUN pip install -r requirements.txt
 
 RUN pip install ultralytics
 
-
 EXPOSE 5051
 
 CMD ["python", "arabic_service.py"]
