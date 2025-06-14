@@ -140,18 +140,6 @@ This can provision:
 - Terraform CLI
 - Jenkins server
 
----
 
-## 👨‍💻 Maintainer
-
-[Yussuf Yasser](https://github.com/yussufyasser)
-
----
-
-## 🧪 TODO
-
-- [ ] Add NGINX ingress controller
-- [ ] Add S3 model hosting & pull
-- [ ] Add metrics & alerts (Prometheus/Grafana)
 
 
