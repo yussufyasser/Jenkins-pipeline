@@ -79,11 +79,14 @@ Terraform automates cloud provisioning:
 - EKS cluster for Kubernetes workloads
 - VPC, security groups, subnets
 
+## ☁️ Orchestration with Kubernetes
+- Deployments for the backend and frontend
+- ClusterIP services for the communication between the frontend and backend
+- Loadblancer service that allows users to communicate with the frontend through port 80
 
-Access via LoadBalancer:
+Terraform automates cloud provisioning:
 
-```bash
-kubectl get svc frontend-service
-```
+- EKS cluster for Kubernetes workloads
+- VPC, security groups, subnets
 
 
