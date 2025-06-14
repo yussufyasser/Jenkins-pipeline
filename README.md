@@ -78,6 +78,18 @@ docker run -p 5051:5051 arabic-sign-api
 
 ---
 
+
+### 🐳 Dockerized Microservices
+
+Each component of the system is containerized using Docker:
+
+- **Arabic Backend** (`arabic/`): YOLOv8 Flask API in Docker
+- **English Backend** (`english/`): YOLOv8 Flask API in Docker
+- **Frontend** (`frontend/`): Flask + HTML UI in Docker
+
+This ensures environment consistency, easy deployment, and scalability. All Dockerfiles are designed for minimal size and fast build times.
+
+
 ## ☸️ Kubernetes Deployment
 
 Manifests included for:
