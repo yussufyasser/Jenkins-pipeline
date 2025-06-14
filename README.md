@@ -6,41 +6,10 @@ A full-stack, production-grade sign language recognition system using real-time 
 
 ## 🧠 Project Architecture
 
-```
-                        +-----------------------+
-                        |      End User         |
-                        |  (Webcam Interface)   |
-                        +-----------+-----------+
-                                    |
-                                    v
-                        +-----------+-----------+
-                        |       Frontend        |
-                        | Flask + index.html UI |
-                        +-----------+-----------+
-                                    |
-           +------------------------+------------------------+
-           |                                                 |
-           v                                                 v
-+-------------------------+                      +-------------------------+
-|     Arabic Model API    |                      |    English Model API    |
-| Flask + YOLOv8 + Docker |                      | Flask + YOLOv8 + Docker |
-+-------------------------+                      +-------------------------+
-           |                                                 |
-           +------------------------+------------------------+
-                                    v
-                            +---------------+
-                            | Kubernetes     |
-                            | Services & DNS |
-                            +-------+-------+
-                                    |
-                                    v
-                            +---------------+
-                            |  Jenkins CI/CD|
-                            |  + Terraform  |
-                            +---------------+
-```
+![System Architecture](architecture.jpg)
 
 ---
+
 
 ## 📁 Project Structure
 
@@ -140,6 +109,17 @@ This can provision:
 - Terraform CLI
 - Jenkins server
 
+---
 
+## 👨‍💻 Maintainer
 
+[Yussuf Yasser](https://github.com/yussufyasser)
+
+---
+
+## 🧪 TODO
+
+- [ ] Add NGINX ingress controller
+- [ ] Add S3 model hosting & pull
+- [ ] Add metrics & alerts (Prometheus/Grafana)
 
