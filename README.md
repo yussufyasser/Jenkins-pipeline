@@ -1,6 +1,6 @@
 # ✋ Bilingual Sign Language Recognition System (Arabic & English)
 
-A full-stack, production-grade sign language recognition system using real-time webcam input, YOLOv8 deep learning models, and an automated CI/CD pipeline powered by Jenkins, Docker, Kubernetes, and Terraform.
+A full-stack, production-grade sign language recognition system using real-time webcam input, YOLOv8 deep learning models, and an automated CI/CD pipeline powered by Jenkins, Docker, Kubernetes, ArgoCD, and Terraform.
 
 ---
 
@@ -17,7 +17,7 @@ Jenkins-pipeline/
 ├── arabic/                 # Arabic model service (Flask + YOLOv8)
 ├── english/                # English model service (Flask + YOLOv8)
 ├── frontend/               # Flask gateway + HTML UI
-├── Jenkinsfile             # Jenkins pipeline stages
+├── Jenkinsfile             # Jenkins pipeline with ArgoCD deployment
 ├── Kubernetes/             # YAML manifests for services and deployments
 └── Terraform/              # IaC scripts for AWS infrastructure
 ```
@@ -27,59 +27,43 @@ Jenkins-pipeline/
 ## 🧠 Technical Overview
 
 ### 🔤 Dual YOLOv8 Inference Services
-- Both `arabic/` and `english/` services load pre-trained `.pt` models using `ultralytics.YOLO`.
-- Each model detects one sign per image with highest confidence.
-- Outputs are returned via Flask APIs in real-time.
+- Flask APIs that load YOLOv8 `.pt` models
+- Accepts base64 image via POST, returns highest confidence character
 
 ### 🌍 Frontend Service
-- Flask app with `index.html` and JS-based webcam interface.
-- Accepts captured image, converts to base64, and sends to the selected backend (Arabic or English).
-- Receives prediction and displays it dynamically.
+- Flask app + HTML interface
+- Captures webcam image, selects language, sends to respective backend
 
-### 🔁 Communication Flow
-- Services communicate via internal DNS in Kubernetes (`arabic-service`, `english-service`).
-- Frontend uses `requests.post()` to call backend APIs with image data.
-
----
-
-## 🚀 Jenkins CI/CD Pipeline
-
-### Jenkins Setup
-1. Deploy Jenkins using EC2 (manual or via Terraform).
-2. Install required plugins:
-   - Docker, Git, Pipeline, Kubernetes CLI
-3. Add Jenkins credentials:
-   - DockerHub login
-   - AWS access key for Terraform
-
-### Pipeline Stages (Defined in `Jenkinsfile`)
-1. **Checkout**: Clones repo from GitHub.
-2. **Unit Testing**: Runs model service tests (Flask endpoints).
-3. **Docker Build**: Builds 3 images (Arabic, English, Frontend).
-4. **Docker Push**: Pushes to DockerHub using Jenkins secrets.
-5. **Kubernetes Deployment**: Applies K8s YAMLs to cluster.
-6. **Notifications**: Logs output, optionally send Slack or email.
-
-### Triggering the Pipeline
-- Manual: Click "Build Now" in Jenkins UI.
-- Automatic: GitHub webhook triggers on push.
+### 🔁 Component Communication
+- Internal DNS in Kubernetes (`arabic-service`, `english-service`)
+- Frontend Flask uses `requests.post()` to backend APIs
 
 ---
 
-## 🐳 Docker Services
+## 🚀 CI/CD Pipeline with Jenkins + ArgoCD
 
-Each microservice has its own `Dockerfile`.
+### Jenkinsfile Pipeline Stages
 
-### Example (Arabic):
-```bash
-docker build -t arabic-sign-api ./arabic
-docker run -p 5051:5051 arabic-sign-api
-```
+1. **SCM Checkout** – Clones this Git repo
+2. **Docker Build & Push** – Builds and pushes images for:
+   - `arabic/`
+   - `english/`
+   - `frontend/`
+3. **YAML Update** – Updates image tags in K8s manifests and commits back to Git
+4. **ArgoCD Sync** – ArgoCD detects Git change and applies updated manifests
+5. **Health Checks** – Waits for healthy ArgoCD app status
+
+### ArgoCD Integration
+
+- Jenkins uses `argocd` CLI to:
+  - Login with token
+  - Sync the app (`sign-lang-app`)
+  - Wait for rollout completion
+- Enables GitOps-style automated deployments from versioned YAML
 
 ---
 
-
-### 🐳 Dockerized Microservices
+## 🐳 Dockerized Microservices
 
 Each component of the system is containerized using Docker:
 
@@ -87,15 +71,25 @@ Each component of the system is containerized using Docker:
 - **English Backend** (`english/`): YOLOv8 Flask API in Docker
 - **Frontend** (`frontend/`): Flask + HTML UI in Docker
 
-This ensures environment consistency, easy deployment, and scalability. All Dockerfiles are designed for minimal size and fast build times.
+Build locally:
 
+```bash
+docker build -t arabic-sign-api ./arabic
+docker build -t english-sign-api ./english
+docker build -t sign-frontend ./frontend
+```
+
+---
 
 ## ☸️ Kubernetes Deployment
 
-Manifests included for:
-- `arabic-service` and `english-service`: Expose model APIs
-- `frontend-service`: Serves UI
-- Each has its own Deployment and ClusterIP Service
+K8s manifests include Deployments and Services for:
+
+- `arabic-service`
+- `english-service`
+- `frontend-service`
+
+Deploy manually (optional):
 
 ```bash
 kubectl apply -f Kubernetes/
@@ -105,37 +99,33 @@ Access via:
 
 ```bash
 minikube service frontend-service
-# OR
-kubectl get svc frontend-service
 ```
 
 ---
 
 ## ☁️ Infrastructure with Terraform
 
-Terraform files provision:
+Terraform automates cloud provisioning:
 
-- Jenkins EC2 instance
-- Security groups, key pairs, subnets
-- Optional EKS cluster (Kubernetes)
+- EC2 instance (for Jenkins or Docker host)
+- VPC, security groups, subnets
+- EKS-compatible config (if needed)
 
-### To Deploy:
 ```bash
 cd Terraform/
 terraform init
 terraform apply
 ```
 
-Backend state can be stored in S3 (configured in `backend.tf`).
-
 ---
 
-## 🔧 Config & Environment
+## 🔧 Configuration & Environment
 
-- Flask backend services support env overrides:
+- Backend Flask APIs respect env variables:
   - `ARABIC_SERVICE_HOST`
   - `ENGLISH_SERVICE_HOST`
-- These map to Kubernetes internal service names.
+
+These default to K8s service names or Docker links.
 
 ---
 
@@ -147,7 +137,21 @@ Backend state can be stored in S3 (configured in `backend.tf`).
 | Docker      | Latest  |
 | Terraform   | ≥ 1.0   |
 | Jenkins     | LTS     |
+| ArgoCD CLI  | Latest  |
 | Kubernetes  | Any     |
-| Ultralytics | YOLOv8  |
+| YOLOv8      | via `ultralytics` |
 
 ---
+
+## 👨‍💻 Maintainer
+
+[Yussuf Yasser](https://github.com/yussufyasser)
+
+---
+
+## 🧪 Future Improvements
+
+- [ ] Add HTTPS with NGINX ingress
+- [ ] Use S3 for model storage
+- [ ] Add Prometheus/Grafana monitoring
+- [ ] GitHub Actions mirror for CI
